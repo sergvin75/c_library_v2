@@ -5,27 +5,6 @@
   <version>0</version>
   <dialect>0</dialect>
   <enums>
-    <enum name="WIFI_NETWORK_SECURITY">
-      <description>WiFi wireless security protocols.</description>
-      <entry value="0" name="WIFI_NETWORK_SECURITY_UNDEFINED">
-        <description>Undefined or unknown security protocol.</description>
-      </entry>
-      <entry value="1" name="WIFI_NETWORK_SECURITY_OPEN">
-        <description>Open network, no security.</description>
-      </entry>
-      <entry value="2" name="WIFI_NETWORK_SECURITY_WEP">
-        <description>WEP.</description>
-      </entry>
-      <entry value="3" name="WIFI_NETWORK_SECURITY_WPA1">
-        <description>WPA1.</description>
-      </entry>
-      <entry value="4" name="WIFI_NETWORK_SECURITY_WPA2">
-        <description>WPA2.</description>
-      </entry>
-      <entry value="5" name="WIFI_NETWORK_SECURITY_WPA3">
-        <description>WPA3.</description>
-      </entry>
-    </enum>
     <enum name="AIRSPEED_SENSOR_FLAGS" bitmask="true">
       <description>Airspeed sensor flags</description>
       <entry value="0" name="AIRSPEED_SENSOR_UNHEALTHY">
@@ -33,28 +12,6 @@
       </entry>
       <entry value="1" name="AIRSPEED_SENSOR_USING">
         <description>True if the data from this sensor is being actively used by the flight controller for guidance, navigation or control.</description>
-      </entry>
-    </enum>
-    <!-- Transactions for parameter protocol -->
-    <enum name="PARAM_TRANSACTION_TRANSPORT">
-      <description>Possible transport layers to set and get parameters via mavlink during a parameter transaction.</description>
-      <entry value="0" name="PARAM_TRANSACTION_TRANSPORT_PARAM">
-        <description>Transaction over param transport.</description>
-      </entry>
-      <entry value="1" name="PARAM_TRANSACTION_TRANSPORT_PARAM_EXT">
-        <description>Transaction over param_ext transport.</description>
-      </entry>
-    </enum>
-    <enum name="PARAM_TRANSACTION_ACTION">
-      <description>Possible parameter transaction actions.</description>
-      <entry value="0" name="PARAM_TRANSACTION_ACTION_START">
-        <description>Commit the current parameter transaction.</description>
-      </entry>
-      <entry value="1" name="PARAM_TRANSACTION_ACTION_COMMIT">
-        <description>Commit the current parameter transaction.</description>
-      </entry>
-      <entry value="2" name="PARAM_TRANSACTION_ACTION_CANCEL">
-        <description>Cancel the current parameter transaction.</description>
       </entry>
     </enum>
     <enum name="MAV_STANDARD_MODE">
@@ -109,33 +66,27 @@
           Other vehicle types must not support this mode (this may be revisited through the PR process).
         </description>
       </entry>
-      <entry value="5" name="MAV_STANDARD_MODE_RETURN_HOME">
-        <description>Return home mode (auto).
-          Automatic mode that returns vehicle to home via a safe flight path.
-          It may also automatically land the vehicle (i.e. RTL).
-          The precise flight path and landing behaviour depend on vehicle configuration and type.
-        </description>
-      </entry>
-      <entry value="6" name="MAV_STANDARD_MODE_SAFE_RECOVERY">
+      <entry value="5" name="MAV_STANDARD_MODE_SAFE_RECOVERY">
         <description>Safe recovery mode (auto).
-          Automatic mode that takes vehicle to a predefined safe location via a safe flight path (rally point or mission defined landing) .
-          It may also automatically land the vehicle.
+          Automatic mode that takes vehicle to a predefined safe location via a safe flight path, and may also automatically land the vehicle.
+          This mode is more commonly referred to as RTL and/or or Smart RTL.
           The precise return location, flight path, and landing behaviour depend on vehicle configuration and type.
+          For example, the vehicle might return to the home/launch location, a rally point, or the start of a mission landing, it might follow a direct path, mission path, or breadcrumb path, and land using a mission landing pattern or some other kind of descent.
         </description>
       </entry>
-      <entry value="7" name="MAV_STANDARD_MODE_MISSION">
+      <entry value="6" name="MAV_STANDARD_MODE_MISSION">
         <description>Mission mode (automatic).
           Automatic mode that executes MAVLink missions.
           Missions are executed from the current waypoint as soon as the mode is enabled.
         </description>
       </entry>
-      <entry value="8" name="MAV_STANDARD_MODE_LAND">
+      <entry value="7" name="MAV_STANDARD_MODE_LAND">
         <description>Land mode (auto).
           Automatic mode that lands the vehicle at the current location.
           The precise landing behaviour depends on vehicle configuration and type.
         </description>
       </entry>
-      <entry value="9" name="MAV_STANDARD_MODE_TAKEOFF">
+      <entry value="8" name="MAV_STANDARD_MODE_TAKEOFF">
         <description>Takeoff mode (auto).
           Automatic takeoff mode.
           The precise takeoff behaviour depends on vehicle configuration and type.
@@ -292,12 +243,6 @@
         <param index="7" label="Altitude/Z">Center point altitude MSL/Z coordinate according to MAV_FRAME. If no MAV_FRAME specified, MAV_FRAME_GLOBAL is assumed.
         INT32_MAX or NaN: Use current vehicle altitude.</param>
       </entry>
-      <entry value="900" name="MAV_CMD_PARAM_TRANSACTION" hasLocation="false" isDestination="false">
-        <description>Request to start or end a parameter transaction. Multiple kinds of transport layers can be used to exchange parameters in the transaction (param, param_ext and mavftp). The command response can either be a success/failure or an in progress in case the receiving side takes some time to apply the parameters.</description>
-        <param index="1" label="Action" enum="PARAM_TRANSACTION_ACTION">Action to be performed (start, commit, cancel, etc.)</param>
-        <param index="2" label="Transport" enum="PARAM_TRANSACTION_TRANSPORT">Possible transport layers to set and get parameters via mavlink during a parameter transaction.</param>
-        <param index="3" label="Transaction ID">Identifier for a specific transaction.</param>
-      </entry>
       <entry value="247" name="MAV_CMD_DO_UPGRADE" hasLocation="false" isDestination="false">
         <description>Request a target system to start an upgrade of one (or all) of its components.
           For example, the command might be sent to a companion computer to cause it to upgrade a connected flight controller.
@@ -310,22 +255,6 @@
         <param index="5">Reserved</param>
         <param index="6">Reserved</param>
         <param index="7">WIP: upgrade progress report rate (can be used for more granular control).</param>
-      </entry>
-      <entry value="301" name="MAV_CMD_GROUP_START" hasLocation="false" isDestination="false">
-        <description>Define start of a group of mission items. When control reaches this command a GROUP_START message is emitted.
-          The end of a group is marked using MAV_CMD_GROUP_END with the same group id.
-          Group ids are expected, but not required, to iterate sequentially.
-          Groups can be nested.</description>
-        <param index="1" label="Group ID" minValue="0" maxValue="16777216" increment="1">Mission-unique group id.
-          Group id is limited because only 24 bit integer can be stored in 32 bit float.</param>
-      </entry>
-      <entry value="302" name="MAV_CMD_GROUP_END" hasLocation="false" isDestination="false">
-        <description>Define end of a group of mission items. When control reaches this command a GROUP_END message is emitted.
-          The start of the group is marked is marked using MAV_CMD_GROUP_START with the same group id.
-          Group ids are expected, but not required, to iterate sequentially.
-          Groups can be nested.</description>
-        <param index="1" label="Group ID" minValue="0" maxValue="16777216" increment="1">Mission-unique group id.
-          Group id is limited because only 24 bit integer can be stored in 32 bit float.</param>
       </entry>
       <entry value="262" name="MAV_CMD_DO_SET_STANDARD_MODE" hasLocation="false" isDestination="false">
         <description>Enable the specified standard MAVLink mode.
@@ -376,6 +305,66 @@
         <param index="6">Empty</param>
         <param index="7">Empty</param>
       </entry>
+      <entry value="43004" name="MAV_CMD_EXTERNAL_WIND_ESTIMATE" hasLocation="false" isDestination="false">
+        <description>Set an external estimate of wind direction and speed.
+          This might be used to provide an initial wind estimate to the estimator (EKF) in the case where the vehicle is wind dead-reckoning, extending the time when operating without GPS before before position drift builds to an unsafe level. For this use case the command might reasonably be sent every few minutes when operating at altitude, and the value is cleared if the estimator resets itself.
+        </description>
+        <param index="1" label="Wind speed" units="m/s" minValue="0">Horizontal wind speed.</param>
+        <param index="2" label="Wind speed accuracy" units="m/s">Estimated 1 sigma accuracy of wind speed. Set to NaN if unknown.</param>
+        <param index="3" label="Direction" units="deg" minValue="0" maxValue="360">Azimuth (relative to true north) from where the wind is blowing.</param>
+        <param index="4" label="Direction accuracy" units="deg">Estimated 1 sigma accuracy of wind direction. Set to NaN if unknown.</param>
+        <param index="5">Empty</param>
+        <param index="6">Empty</param>
+        <param index="7">Empty</param>
+      </entry>
+      <entry value="32100" name="MAV_CMD_REQUEST_OPERATOR_CONTROL" hasLocation="false" isDestination="false">
+        <description>Request GCS control of a system (or of a specific component in a system).
+
+          A controlled system should only accept MAVLink commands and command-like messages that are sent by its controlling GCS, or from other components with the same system id.
+          Commands from other systems should be rejected with MAV_RESULT_FAILED (except for this command, which may be acknowledged with MAV_RESULT_ACCEPTED if control is granted).
+          Command-like messages should be ignored (or rejected if that is supported by their associated protocol).
+
+          GCS control of the whole system is managed via a single component that we will refer to here as the "system manager component".
+          This component streams the CONTROL_STATUS message and sets the GCS_CONTROL_STATUS_FLAGS_SYSTEM_MANAGER flag.
+          Other components in the system should monitor for the CONTROL_STATUS message with this flag, and set their controlling GCS to match its published system id.
+          A GCS that wants to control the system should also monitor for the same message and flag, and address the MAV_CMD_REQUEST_OPERATOR_CONTROL to its component id.
+          Note that integrators are required to ensure that there is only one system manager component in the system (i.e. one component emitting the message with GCS_CONTROL_STATUS_FLAGS_SYSTEM_MANAGER set).
+   
+          The MAV_CMD_REQUEST_OPERATOR_CONTROL command is sent by a GCS to the system manager component to request or release control of a system, specifying whether subsequent takeover requests from another GCS are automatically granted, or require permission.
+
+          The system manager component should grant control to the GCS if the system does not require takeover permission (or is uncontrolled) and ACK the request with MAV_RESULT_ACCEPTED.
+          The system manager component should then stream CONTROL_STATUS indicating its controlling system: all other components with the same system id should monitor this message and set their own controlling GCS to match that of the system manager component.
+
+          If the system manager component cannot grant control (because takeover requires permission), the request should be rejected with MAV_RESULT_FAILED.
+          The system manager component should then send this same command to the current owning GCS in order to notify of the request.
+          The owning GCS would ACK with MAV_RESULT_ACCEPTED, and might choose to release control of the vehicle, or re-request control with the takeover bit set to allow permission. 
+          In case it choses to re-request control with takeover bit set to allow permission, requestor GCS will only have 10 seconds to get control, otherwise owning GCS will re-request control with takeover bit set to disallow permission, and requestor GCS will need repeat the request if still interested in getting control.
+          Note that the pilots of both GCS should co-ordinate safe handover offline.
+          
+          Note that in most systems the only controlled component will be the "system manager component", and that will be the autopilot.
+          However separate GCS control of a particular component is also permitted, if supported by the component.
+          In this case the GCS will address MAV_CMD_REQUEST_OPERATOR_CONTROL to the specific component it wants to control.
+          The component will then stream CONTROL_STATUS for its controlling GCS (it must not set GCS_CONTROL_STATUS_FLAGS_SYSTEM_MANAGER).
+          The component should fall back to the system GCS (if any) when it is not directly controlled, and may stop emitting CONTROL_STATUS.
+          The flow is otherwise the same as for requesting control over the whole system.
+        </description>
+        <param index="1" label="Sysid requesting control">System ID of GCS requesting control. 0 when command sent from GCS to autopilot (autopilot determines requesting GCS sysid from message header). Sysid of GCS requesting control when command sent by autopilot to controlling GCS.</param>
+        <param index="2" label="Action">0: Release control, 1: Request control.</param>
+        <param index="3" label="Allow takeover">Enable automatic granting of ownership on request (by default reject request and notify current owner). 0: Ask current owner and reject request, 1: Allow automatic takeover.</param>
+        <param index="4" label="Request timeout" units="s" minValue="3" maxValue="60">Timeout in seconds before a request to a GCS to allow takeover is assumed to be rejected. This is used to display the timeout graphically on requestor and GCS in control.</param>
+        <param index="5">Empty</param>
+        <param index="6">Empty</param>
+        <param index="7">Empty</param>
+      </entry>
+    </enum>
+    <enum name="GCS_CONTROL_STATUS_FLAGS" bitmask="true">
+      <description>CONTROL_STATUS flags.</description>
+      <entry value="1" name="GCS_CONTROL_STATUS_FLAGS_SYSTEM_MANAGER">
+        <description>If set, this CONTROL_STATUS publishes the controlling GCS for the whole system. If unset, the CONTROL_STATUS indicates the controlling GCS for just the component emitting the message. Note that to request control of the system a GCS should send MAV_CMD_REQUEST_OPERATOR_CONTROL to the component emitting CONTROL_STATUS with this flag set.</description>
+      </entry>
+      <entry value="2" name="GCS_CONTROL_STATUS_FLAGS_TAKEOVER_ALLOWED">
+        <description>Takeover allowed (requests for control will be granted). If not set requests for control will be rejected, but the controlling GCS will be notified (and may release control or allow takeover).</description>
+      </entry>
     </enum>
     <enum name="TARGET_ABSOLUTE_SENSOR_CAPABILITY_FLAGS" bitmask="true">
       <description>These flags indicate the sensor reporting capabilities for TARGET_ABSOLUTE.</description>
@@ -409,18 +398,95 @@
         <description>Channel data may be out of date. This is set when the receiver is unable to validate incoming data from the transmitter and has therefore resent the last valid data it received.</description>
       </entry>
     </enum>
+    <enum name="GPS_SYSTEM_ERROR_FLAGS" bitmask="true">
+      <description>Flags indicating errors in a GPS receiver.</description>
+      <entry value="1" name="GPS_SYSTEM_ERROR_INCOMING_CORRECTIONS">
+        <description>There are problems with incoming correction streams.</description>
+      </entry>
+      <entry value="2" name="GPS_SYSTEM_ERROR_CONFIGURATION">
+        <description>There are problems with the configuration.</description>
+      </entry>
+      <entry value="4" name="GPS_SYSTEM_ERROR_SOFTWARE">
+        <description>There are problems with the software on the GPS receiver.</description>
+      </entry>
+      <entry value="8" name="GPS_SYSTEM_ERROR_ANTENNA">
+        <description>There are problems with an antenna connected to the GPS receiver.</description>
+      </entry>
+      <entry value="16" name="GPS_SYSTEM_ERROR_EVENT_CONGESTION">
+        <description>There are problems handling all incoming events.</description>
+      </entry>
+      <entry value="32" name="GPS_SYSTEM_ERROR_CPU_OVERLOAD">
+        <description>The GPS receiver CPU is overloaded.</description>
+      </entry>
+      <entry value="64" name="GPS_SYSTEM_ERROR_OUTPUT_CONGESTION">
+        <description>The GPS receiver is experiencing output congestion.</description>
+      </entry>
+    </enum>
+    <enum name="GPS_AUTHENTICATION_STATE">
+      <description>Signal authentication state in a GPS receiver.</description>
+      <entry value="0" name="GPS_AUTHENTICATION_STATE_UNKNOWN">
+        <description>The GPS receiver does not provide GPS signal authentication info.</description>
+      </entry>
+      <entry value="1" name="GPS_AUTHENTICATION_STATE_INITIALIZING">
+        <description>The GPS receiver is initializing signal authentication.</description>
+      </entry>
+      <entry value="2" name="GPS_AUTHENTICATION_STATE_ERROR">
+        <description>The GPS receiver encountered an error while initializing signal authentication.</description>
+      </entry>
+      <entry value="3" name="GPS_AUTHENTICATION_STATE_OK">
+        <description>The GPS receiver has correctly authenticated all signals.</description>
+      </entry>
+      <entry value="4" name="GPS_AUTHENTICATION_STATE_DISABLED">
+        <description>GPS signal authentication is disabled on the receiver.</description>
+      </entry>
+    </enum>
+    <enum name="GPS_JAMMING_STATE">
+      <description>Signal jamming state in a GPS receiver.</description>
+      <entry value="0" name="GPS_JAMMING_STATE_UNKNOWN">
+        <description>The GPS receiver does not provide GPS signal jamming info.</description>
+      </entry>
+      <entry value="1" name="GPS_JAMMING_STATE_OK">
+        <description>The GPS receiver detected no signal jamming.</description>
+      </entry>
+      <entry value="2" name="GPS_JAMMING_STATE_MITIGATED">
+        <description>The GPS receiver detected and mitigated signal jamming.</description>
+      </entry>
+      <entry value="3" name="GPS_JAMMING_STATE_DETECTED">
+        <description>The GPS receiver detected signal jamming.</description>
+      </entry>
+    </enum>
+    <enum name="GPS_SPOOFING_STATE">
+      <description>Signal spoofing state in a GPS receiver.</description>
+      <entry value="0" name="GPS_SPOOFING_STATE_UNKNOWN">
+        <description>The GPS receiver does not provide GPS signal spoofing info.</description>
+      </entry>
+      <entry value="1" name="GPS_SPOOFING_STATE_OK">
+        <description>The GPS receiver detected no signal spoofing.</description>
+      </entry>
+      <entry value="2" name="GPS_SPOOFING_STATE_MITIGATED">
+        <description>The GPS receiver detected and mitigated signal spoofing.</description>
+      </entry>
+      <entry value="3" name="GPS_SPOOFING_STATE_DETECTED">
+        <description>The GPS receiver detected signal spoofing but still has a fix.</description>
+      </entry>
+    </enum>
+    <enum name="GPS_RAIM_STATE">
+      <description>State of RAIM processing.</description>
+      <entry value="0" name="GPS_RAIM_STATE_UNKNOWN">
+        <description>RAIM capability is unknown.</description>
+      </entry>
+      <entry value="1" name="GPS_RAIM_STATE_DISABLED">
+        <description>RAIM is disabled.</description>
+      </entry>
+      <entry value="2" name="GPS_RAIM_STATE_OK">
+        <description>RAIM integrity check was successful.</description>
+      </entry>
+      <entry value="3" name="GPS_RAIM_STATE_FAILED">
+        <description>RAIM integrity check failed.</description>
+      </entry>
+    </enum>
   </enums>
   <messages>
-    <!-- Transactions for parameter protocol -->
-    <message id="19" name="PARAM_ACK_TRANSACTION">
-      <description>Response from a PARAM_SET message when it is used in a transaction.</description>
-      <field type="uint8_t" name="target_system">Id of system that sent PARAM_SET message.</field>
-      <field type="uint8_t" name="target_component">Id of system that sent PARAM_SET message.</field>
-      <field type="char[16]" name="param_id">Parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string</field>
-      <field type="float" name="param_value">Parameter value (new value if PARAM_ACCEPTED, current value otherwise)</field>
-      <field type="uint8_t" name="param_type" enum="MAV_PARAM_TYPE">Parameter type.</field>
-      <field type="uint8_t" name="param_result" enum="PARAM_ACK">Result code.</field>
-    </message>
     <message id="295" name="AIRSPEED">
       <description>Airspeed information from a sensor.</description>
       <field type="uint8_t" name="id" instance="true">Sensor ID.</field>
@@ -428,14 +494,6 @@
       <field type="int16_t" name="temperature" units="cdegC">Temperature. INT16_MAX for value unknown/not supplied.</field>
       <field type="float" name="raw_press" units="hPa">Raw differential pressure. NaN for value unknown/not supplied.</field>
       <field type="uint8_t" name="flags" enum="AIRSPEED_SENSOR_FLAGS">Airspeed sensor flags.</field>
-    </message>
-    <message id="298" name="WIFI_NETWORK_INFO">
-      <description>Detected WiFi network status information. This message is sent per each WiFi network detected in range with known SSID and general status parameters.</description>
-      <field type="char[32]" name="ssid">Name of Wi-Fi network (SSID).</field>
-      <field type="uint8_t" name="channel_id">WiFi network operating channel ID. Set to 0 if unknown or unidentified.</field>
-      <field type="uint8_t" name="signal_quality" units="%">WiFi network signal quality.</field>
-      <field type="uint16_t" name="data_rate" units="MiB/s">WiFi network data rate. Set to UINT16_MAX if data_rate information is not supplied.</field>
-      <field type="uint8_t" name="security" enum="WIFI_NETWORK_SECURITY">WiFi network security type.</field>
     </message>
     <message id="354" name="SET_VELOCITY_LIMITS">
       <wip/>
@@ -477,7 +535,7 @@
     <message id="369" name="BATTERY_STATUS_V2">
       <description>Battery dynamic information.
         This should be streamed (nominally at 1Hz).
-        Static/invariant battery information is sent in SMART_BATTERY_INFO.
+        Static/invariant battery information is sent in BATTERY_INFO.
         Note that smart batteries should set the MAV_BATTERY_STATUS_FLAGS_CAPACITY_RELATIVE_TO_FULL bit to indicate that supplied capacity values are relative to a battery that is known to be full.
         Power monitors would not set this bit, indicating that capacity_consumed is relative to drone power-on, and that other values are estimated based on the assumption that the battery was full on power-on.
       </description>
@@ -486,20 +544,9 @@
       <field type="float" name="voltage" units="V" invalid="NaN">Battery voltage (total). NaN: field not provided.</field>
       <field type="float" name="current" units="A" invalid="NaN">Battery current (through all cells/loads). Positive value when discharging and negative if charging. NaN: field not provided.</field>
       <field type="float" name="capacity_consumed" units="Ah" invalid="NaN">Consumed charge. NaN: field not provided. This is either the consumption since power-on or since the battery was full, depending on the value of MAV_BATTERY_STATUS_FLAGS_CAPACITY_RELATIVE_TO_FULL.</field>
-      <field type="float" name="capacity_remaining" units="Ah" invalid="NaN">Remaining charge (until empty). UINT32_MAX: field not provided. Note: If MAV_BATTERY_STATUS_FLAGS_CAPACITY_RELATIVE_TO_FULL is unset, this value is based on the assumption the battery was full when the system was powered.</field>
+      <field type="float" name="capacity_remaining" units="Ah" invalid="NaN">Remaining charge (until empty). NaN: field not provided. Note: If MAV_BATTERY_STATUS_FLAGS_CAPACITY_RELATIVE_TO_FULL is unset, this value is based on the assumption the battery was full when the system was powered.</field>
       <field type="uint8_t" name="percent_remaining" units="%" invalid="UINT8_MAX">Remaining battery energy. Values: [0-100], UINT8_MAX: field not provided.</field>
       <field type="uint32_t" name="status_flags" display="bitmask" enum="MAV_BATTERY_STATUS_FLAGS">Fault, health, readiness, and other status indications.</field>
-    </message>
-    <message id="396" name="COMPONENT_INFORMATION_BASIC">
-      <description>Basic component information data. Should be requested using MAV_CMD_REQUEST_MESSAGE on startup, or when required.</description>
-      <field type="uint32_t" name="time_boot_ms" units="ms">Timestamp (time since system boot).</field>
-      <field type="uint64_t" name="capabilities" enum="MAV_PROTOCOL_CAPABILITY" display="bitmask">Component capability flags</field>
-      <field type="uint32_t" name="time_manufacture_s" units="s" invalid="0">Date of manufacture as a UNIX Epoch time (since 1.1.1970) in seconds.</field>
-      <field type="char[32]" name="vendor_name">Name of the component vendor. Needs to be zero terminated. The field is optional and can be empty/all zeros.</field>
-      <field type="char[32]" name="model_name">Name of the component model. Needs to be zero terminated. The field is optional and can be empty/all zeros.</field>
-      <field type="char[24]" name="software_version">Software version. The recommended format is SEMVER: 'major.minor.patch'  (any format may be used). The field must be zero terminated if it has a value. The field is optional and can be empty/all zeros.</field>
-      <field type="char[24]" name="hardware_version">Hardware version. The recommended format is SEMVER: 'major.minor.patch'  (any format may be used). The field must be zero terminated if it has a value. The field is optional and can be empty/all zeros.</field>
-      <field type="char[32]" name="serial_number">Hardware serial number. The field must be zero terminated if it has a value. The field is optional and can be empty/all zeros.</field>
     </message>
     <message id="414" name="GROUP_START">
       <description>Emitted during mission execution when control reaches MAV_CMD_GROUP_START.</description>
@@ -569,6 +616,21 @@
       </description>
       <field type="uint8_t" name="seq">Sequence number. The value iterates sequentially whenever AVAILABLE_MODES changes (e.g. support for a new mode is added/removed dynamically).</field>
     </message>
+    <message id="441" name="GNSS_INTEGRITY">
+      <description>Information about key components of GNSS receivers, like signal authentication, interference and system errors.</description>
+      <field type="uint8_t" name="id" instance="true">GNSS receiver id. Must match instance ids of other messages from same receiver.</field>
+      <field type="uint32_t" name="system_errors" enum="GPS_SYSTEM_ERROR_FLAGS" display="bitmask">Errors in the GPS system.</field>
+      <field type="uint8_t" name="authentication_state" enum="GPS_AUTHENTICATION_STATE">Signal authentication state of the GPS system.</field>
+      <field type="uint8_t" name="jamming_state" enum="GPS_JAMMING_STATE">Signal jamming state of the GPS system.</field>
+      <field type="uint8_t" name="spoofing_state" enum="GPS_SPOOFING_STATE">Signal spoofing state of the GPS system.</field>
+      <field type="uint8_t" name="raim_state" enum="GPS_RAIM_STATE">The state of the RAIM processing.</field>
+      <field type="uint16_t" name="raim_hfom" units="cm" invalid="UINT16_MAX">Horizontal expected accuracy using satellites successfully validated using RAIM.</field>
+      <field type="uint16_t" name="raim_vfom" units="cm" invalid="UINT16_MAX">Vertical expected accuracy using satellites successfully validated using RAIM.</field>
+      <field type="uint8_t" name="corrections_quality" minValue="0" maxValue="10" invalid="UINT8_MAX">An abstract value representing the estimated quality of incoming corrections, or 255 if not available.</field>
+      <field type="uint8_t" name="system_status_summary" minValue="0" maxValue="10" invalid="UINT8_MAX">An abstract value representing the overall status of the receiver, or 255 if not available.</field>
+      <field type="uint8_t" name="gnss_signal_quality" minValue="0" maxValue="10" invalid="UINT8_MAX">An abstract value representing the quality of incoming GNSS signals, or 255 if not available.</field>
+      <field type="uint8_t" name="post_processing_quality" minValue="0" maxValue="10" invalid="UINT8_MAX">An abstract value representing the estimated PPK quality, or 255 if not available.</field>
+    </message>
     <!-- Target info from a sensor on the target -->
     <message id="510" name="TARGET_ABSOLUTE">
       <description>Current motion information from sensors on a target</description>
@@ -600,6 +662,11 @@
       <field type="float[4]" name="q_target">Quaternion of the target's orientation from the target's frame to the TARGET_OBS_FRAME (w, x, y, z order, zero-rotation is 1, 0, 0, 0)</field>
       <field type="float[4]" name="q_sensor">Quaternion of the sensor's orientation from TARGET_OBS_FRAME to vehicle-carried NED. (Ignored if set to (0,0,0,0)) (w, x, y, z order, zero-rotation is 1, 0, 0, 0)</field>
       <field type="uint8_t" name="type" enum="LANDING_TARGET_TYPE">Type of target</field>
+    </message>
+    <message id="512" name="CONTROL_STATUS">
+      <description>Information about GCS in control of this MAV. This should be broadcast at low rate (nominally 1 Hz) and emitted when ownership or takeover status change. Control over MAV is requested using MAV_CMD_REQUEST_OPERATOR_CONTROL.</description>
+      <field type="uint8_t" name="sysid_in_control">System ID of GCS MAVLink component in control (0: no GCS in control).</field>
+      <field type="uint8_t" name="flags" enum="GCS_CONTROL_STATUS_FLAGS" display="bitmask">Control status. For example, whether takeover is allowed, and whether this message instance defines the default controlling GCS for the whole system.</field>
     </message>
   </messages>
 </mavlink>
